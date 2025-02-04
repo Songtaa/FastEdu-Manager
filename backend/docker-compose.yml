@@ -1,0 +1,81 @@
+services:
+  app:
+      # image: master-image
+      build:
+        context: .
+        dockerfile: Dockerfile
+      restart: always
+      container_name: kace-mobile-app
+      ports:
+        - "8000:8000"
+      networks:
+        - kace-mobile-network
+      env_file:
+        - .env
+      depends_on:
+        postgres:
+          condition: service_healthy
+      environment:
+        DOCKER: "true"
+        # DATABASE_URL: "postgresql+asyncpg://postgres:postgres@password:5432/kace_mobile"
+        DATABASE_URL: "postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}:${POSTGRES_SERVER}:${POSTGRES_PORT}/${POSTGRES_DB}"
+        command: bash -c "alembic revision --autogenerate -m 'your_message' && alembic upgrade head"
+
+  pgadmin:
+    build:
+      context: ./pgadmin
+      dockerfile: dockerfile
+    container_name: kace-mobile-pgadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - kace-mobile-network
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    container_name: kace-mobile-postgres
+    restart: always
+    networks:
+      - kace-mobile-network
+    ports: # Use ports instead of expose for host binding
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: kace_mobile
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: kace-mobile-redis
+    restart: always
+    expose:
+      - "6379"
+    networks:
+      - kace-mobile-network
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+
+  
+
+volumes:
+  pgadmin_data:
+  postgres_data:
+    driver: local
+
+networks:
+  kace-mobile-network:
+    driver: bridge

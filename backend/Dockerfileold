@@ -1,0 +1,41 @@
+FROM python:3.10-buster AS builder
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+RUN pip install poetry==1.8.3
+
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_IN_PROJECT=1 \
+    POETRY_VIRTUALENVS_CREATE=1 \
+    # POETRY_CACHE_DIR=/root/.cache/pypoetry
+    POETRY_CACHE_DIR=/tmp/poetry_cache
+
+
+WORKDIR /app
+
+COPY ./pyproject.toml ./poetry.lock ./app/alembic.ini ./
+# RUN touch README.md
+
+
+RUN --mount=type=cache \
+    --mount=type=bind,source=poetry.lock,target=poetry.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
+    # poetry install --no-root --only main --no-interaction
+
+# RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --no-root
+
+
+FROM python:3.10-slim-buster AS runtime
+
+ENV VIRTUAL_ENV=/app/.venv \
+    PATH="/app/.venv/bin:$PATH"
+
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+
+COPY . .
+
+# CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["poetry","run","python","-m", "app.main"]
