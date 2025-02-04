@@ -9,12 +9,12 @@ class RoleRead(BaseModel):
     id: UUID
     name: str
 
-class PermissionCreate(BaseModel):
-    name: str
+# class PermissionCreate(BaseModel):
+#     name: str
 
-class PermissionRead(BaseModel):
-    id: UUID
-    name: str
+# class PermissionRead(BaseModel):
+#     id: UUID
+#     name: str
 
-class RoleWithPermissions(RoleRead):
-    permissions: List[PermissionRead] = []
+# class RoleWithPermissions(RoleRead):
+#     permissions: List[PermissionRead] = []
