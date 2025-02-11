@@ -4,5 +4,6 @@ from typing import List, Optional
 from role import RoleRead
 from permission import PermissionRead
 
-class RoleWithPermissions(RoleRead):
+class RolePermissions(RoleRead):
     permissions: List[PermissionRead] = []
+

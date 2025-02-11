@@ -2,12 +2,24 @@ from pydantic import BaseModel
 from uuid import UUID
 from typing import List, Optional
 
-class RoleCreate(BaseModel):
+
+class RoleBase(BaseModel):
     name: str
+
+class RoleCreate(RoleBase):
+    pass
+
+class RoleUpdate(BaseModel):
+    name: Optional[str]
 
 class RoleRead(BaseModel):
     id: UUID
-    name: str
+    
+    class Config:
+        orm_mode = True
+    
+class RoleSchema(RoleRead):
+    pass
 
 # class PermissionCreate(BaseModel):
 #     name: str

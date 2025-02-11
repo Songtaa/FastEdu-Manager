@@ -5,11 +5,11 @@ services:
         context: .
         dockerfile: Dockerfile
       restart: always
-      container_name: kace-mobile-app
+      container_name: fastedu-app
       ports:
         - "8000:8000"
       networks:
-        - kace-mobile-network
+        - fastedu-network
       env_file:
         - .env
       depends_on:
@@ -25,7 +25,7 @@ services:
     build:
       context: ./pgadmin
       dockerfile: dockerfile
-    container_name: kace-mobile-pgadmin
+    container_name: pgadmin
     restart: always
     ports:
       - "8081:80"
@@ -35,16 +35,16 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:
-      - kace-mobile-network
+      - fastedu-network
     depends_on:
       - postgres
 
   postgres:
     image: postgres
-    container_name: kace-mobile-postgres
+    container_name: postgres
     restart: always
     networks:
-      - kace-mobile-network
+      - fastedu-network
     ports: # Use ports instead of expose for host binding
       - "5433:5432"
     volumes:
@@ -60,12 +60,12 @@ services:
 
   redis:
     image: redis:latest
-    container_name: kace-mobile-redis
+    container_name: redis
     restart: always
     expose:
       - "6379"
     networks:
-      - kace-mobile-network
+      - fastedu-network
     environment:
       ALLOW_EMPTY_PASSWORD: "yes"
 
@@ -77,5 +77,5 @@ volumes:
     driver: local
 
 networks:
-  kace-mobile-network:
+  fastedu-network:
     driver: bridge

@@ -13,6 +13,8 @@
 from app.domains.auth.apis.users_router import user_router
 from app.domains.auth.apis.login_router import auth_router
 from app.domains.kace.apis.services_router import service_router
+from app.domains.auth.apis.role import role_router
+from app.domains.auth.apis.permission import permission_router
 from fastapi import APIRouter
 
 router = APIRouter()
@@ -31,3 +33,5 @@ router = APIRouter()
 router.include_router(auth_router)
 router.include_router(user_router)
 router.include_router(service_router)
+router.include_router(role_router)
+router.include_router(permission_router)

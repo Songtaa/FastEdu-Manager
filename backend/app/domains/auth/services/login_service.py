@@ -29,7 +29,7 @@ class AuthService:
 
             if password_valid:
                 access_token = Security.create_access_token(
-                    user_data={"email": user.email, "user_uid": str(user.id), "role": user.role}
+                    user_data={"email": user.email, "user_uid": str(user.id), "role": user.roles}
                 )
 
                 refresh_token = Security.create_access_token(

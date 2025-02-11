@@ -37,6 +37,7 @@ from app.domains.auth.apis.users_router import create_user_Account
 async def init_db() -> None:
     # Create tables
     async with async_engine.begin() as conn:
+        # print(APIBase.metadata.tables.keys())
         await conn.run_sync(APIBase.metadata.create_all)
 
     # Create a default admin user
